@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { SigninUserDto } from 'src/dto/signin.user.dto';
 import { LoginUserDto } from 'src/dto/login.user.dto';
@@ -16,10 +16,11 @@ export class AuthController {
   }
 
   @Get('login')
-  login(@Body() body: LoginUserDto) {
+  login(@Query() query: LoginUserDto) {
+    console.log(query);
     return this.authService.logIn({
-      username: body.username,
-      password: body.password,
+      username: query.username,
+      password: query.password,
     });
   }
 }
