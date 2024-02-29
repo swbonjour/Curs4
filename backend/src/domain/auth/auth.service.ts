@@ -1,10 +1,9 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { SigninUserDto } from 'src/dto/signin.user.dto';
 import { User } from 'src/entities/User.entity';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { LoginUserDto } from 'src/dto/login.user.dto';
+import { AuthResponseDto, LoginUserDto, SigninUserDto } from 'src/dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -13,7 +12,7 @@ export class AuthService {
     private readonly jwtService: JwtService,
   ) {}
 
-  async signIn(dto: SigninUserDto): Promise<IUserData> {
+  async signIn(dto: SigninUserDto): Promise<AuthResponseDto> {
     const user = await this.dataSource.manager.findOne(User, {
       where: { username: dto.username },
     });
@@ -41,11 +40,12 @@ export class AuthService {
 
     return {
       username: createdUser.username,
+      score: createdUser.score,
       access_token: accessToken,
     };
   }
 
-  async logIn(dto: LoginUserDto): Promise<IUserData> {
+  async logIn(dto: LoginUserDto): Promise<AuthResponseDto> {
     const user = await this.dataSource.manager.findOne(User, {
       where: { username: dto.username },
     });
@@ -66,6 +66,7 @@ export class AuthService {
       });
       return {
         username: user.username,
+        score: user.score,
         access_token: accessToken,
       };
     } else {

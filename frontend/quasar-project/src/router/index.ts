@@ -1,4 +1,3 @@
-import { route } from 'quasar/wrappers';
 import {
   createMemoryHistory,
   createRouter,
@@ -30,5 +29,25 @@ const Router = createRouter({
   // quasar.conf.js -> build -> publicPath
   history: createHistory(process.env.VUE_ROUTER_BASE),
 });
+
+Router.beforeEach((to, from) => {
+  if(!checkAuth() && to.path !== '/auth') {
+    return '/auth'
+  }
+});
+
+const checkAuth = () => {
+  const jwt = localStorage.getItem('jwt');
+  if (!jwt) {
+    return false;
+  }
+  const splitted = jwt.split('.');
+  const exp = JSON.parse(atob(splitted[1])).exp * 1000;
+  if (Date.now() > exp) {
+    return false;
+  } else {
+    return true;
+  }
+};
 
 export default Router;

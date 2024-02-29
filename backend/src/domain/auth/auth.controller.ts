@@ -1,26 +1,21 @@
-import { Body, Controller, Get, Param, Post, Query } from '@nestjs/common';
+import { Body, Controller, Get, Post, Query } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { SigninUserDto } from 'src/dto/signin.user.dto';
-import { LoginUserDto } from 'src/dto/login.user.dto';
+import { AuthResponseDto, LoginUserDto, SigninUserDto } from 'src/dto/auth.dto';
+import { ApiResponse } from '@nestjs/swagger';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   @Post('signin')
-  signIn(@Body() body: SigninUserDto) {
-    return this.authService.signIn({
-      username: body.username,
-      password: body.password,
-    });
+  @ApiResponse({ type: AuthResponseDto })
+  async signIn(@Body() body: SigninUserDto): Promise<AuthResponseDto> {
+    return await this.authService.signIn(body);
   }
 
   @Get('login')
-  login(@Query() query: LoginUserDto) {
-    console.log(query);
-    return this.authService.logIn({
-      username: query.username,
-      password: query.password,
-    });
+  @ApiResponse({ type: AuthResponseDto })
+  async login(@Query() query: LoginUserDto): Promise<AuthResponseDto> {
+    return await this.authService.logIn(query);
   }
 }

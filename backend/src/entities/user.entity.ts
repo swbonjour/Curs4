@@ -13,4 +13,7 @@ export class User {
 
   @Column({ default: false, type: 'boolean' })
   is_admin: boolean;
+
+  @Column({ default: 0, type: 'integer' })
+  score: number;
 }
