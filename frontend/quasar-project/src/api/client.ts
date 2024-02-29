@@ -15,14 +15,23 @@ export interface SigninUserDto {
 }
 
 export interface AuthResponseDto {
-  username: string;
-  score: number;
+  userId: string;
   access_token: string;
 }
+
+export type User = object;
 
 export interface AuthControllerLoginParams {
   username: string;
   password: string;
+}
+
+export interface AuthControllerWhoAmIParams {
+  jwt: string;
+}
+
+export interface UserControllerGetUserByIdParams {
+  id: string;
 }
 
 import type { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from 'axios';
@@ -201,13 +210,30 @@ export class LangApi<SecurityDataType extends unknown> extends HttpClient<Securi
     /**
      * No description
      *
-     * @name UserControllerGetAllUsers
-     * @request GET:/api/v1/user
+     * @name AuthControllerWhoAmI
+     * @request GET:/api/v1/auth/who-am-i
      */
-    userControllerGetAllUsers: (params: RequestParams = {}) =>
-      this.request<void, any>({
-        path: `/api/v1/user`,
+    authControllerWhoAmI: (query: AuthControllerWhoAmIParams, params: RequestParams = {}) =>
+      this.request<AuthResponseDto, any>({
+        path: `/api/v1/auth/who-am-i`,
         method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name UserControllerGetUserById
+     * @request GET:/api/v1/user/{id}
+     */
+    userControllerGetUserById: ({ id, ...query }: UserControllerGetUserByIdParams, params: RequestParams = {}) =>
+      this.request<User, any>({
+        path: `/api/v1/user/${id}`,
+        method: 'GET',
+        query: query,
+        format: 'json',
         ...params,
       }),
   };

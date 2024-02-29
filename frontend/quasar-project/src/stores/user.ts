@@ -3,8 +3,10 @@ import { UserDto } from 'src/types/user';
 
 export const useUserStore = defineStore('user', {
   state: (): UserDto => ({
+    id: '' as string,
     username: '' as string,
     score: 0 as number,
+    is_admin: false as boolean,
   }),
 
   getters: {
@@ -15,10 +17,10 @@ export const useUserStore = defineStore('user', {
 
   actions: {
     setUser(action: UserDto) {
-      localStorage.setItem('username', action.username);
-      localStorage.setItem('score', String(action.score));
+      this.id = action.id;
       this.username = action.username;
       this.score = action.score;
+      this.is_admin = action.is_admin;
     },
   },
 });

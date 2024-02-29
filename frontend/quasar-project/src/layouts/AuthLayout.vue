@@ -37,6 +37,8 @@ import Router from 'src/router';
 import { useUserStore } from 'src/stores/user';
 import { ApiClient, client } from 'src/api/index';
 import { AuthResponseDto } from 'src/api/client';
+import { UserDto } from 'src/types/user';
+import { stat } from 'fs';
 
 const userStore = useUserStore();
 
@@ -46,38 +48,71 @@ const password = ref('');
 const err = ref('');
 
 const signIn = async () => {
+  let userData: AuthResponseDto | undefined;
   await ApiClient.authControllerSignIn({
     username: login.value,
     password: password.value,
   })
-    .then((res) => {
-      setUserData(res);
+    .then(async (res) => {
+      userData = res as AuthResponseDto;
     })
     .catch((rej) => {
       err.value = rej.response.data.message;
     });
+
+  if (userData) {
+    const status = await setUserData(userData);
+    if (status) {
+      Router.push('/main');
+    }
+  }
 };
 
 const logIn = async () => {
+  let userData: AuthResponseDto | undefined;
   await ApiClient.authControllerLogin({
     username: login.value,
     password: password.value,
   })
-    .then((res) => {
-      setUserData(res);
-      Router.push('/main');
+    .then(async (res) => {
+      userData = res as AuthResponseDto;
     })
     .catch((rej) => {
       err.value = rej.response.data.message;
     });
+
+  if (userData) {
+    const status = await setUserData(userData);
+    if (status) {
+      Router.push('/main');
+    }
+  }
 };
 
-const setUserData = (res: AuthResponseDto) => {
+const setUserData = async (res: AuthResponseDto): Promise<boolean> => {
   localStorage.setItem('jwt', res.access_token);
   client.setSecurityData(res.access_token);
-  userStore.$reset();
-  userStore.setUser({ username: res.username, score: res.score });
-  Router.push('/main');
+
+  let status = false;
+
+  await ApiClient.userControllerGetUserById({
+    id: res.userId,
+  })
+    .then((u) => {
+      const user = u as UserDto;
+      userStore.setUser({
+        id: user.id,
+        username: user.username,
+        score: user.score,
+        is_admin: user.is_admin,
+      });
+      status = true;
+    })
+    .catch((rej) => {
+      err.value = rej.response.data.message;
+    });
+
+  return status;
 };
 </script>
 <style scoped>
