@@ -23,11 +23,20 @@ export class SigninUserDto {
 
 export class AuthResponseDto {
   @ApiProperty({ type: String })
-  username: string;
-
-  @ApiProperty({ type: Number })
-  score: number;
+  userId: string;
 
   @ApiProperty({ type: String })
   access_token: string;
+}
+
+export class JwtDto {
+  @ApiProperty()
+  @IsString()
+  jwt: string;
+}
+
+export class WhoAmIDto {
+  @ApiProperty()
+  @IsString()
+  id: string;
 }

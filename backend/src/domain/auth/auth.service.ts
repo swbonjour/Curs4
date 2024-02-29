@@ -1,9 +1,20 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { User } from 'src/entities/User.entity';
 import { DataSource } from 'typeorm';
 import * as bcrypt from 'bcrypt';
-import { AuthResponseDto, LoginUserDto, SigninUserDto } from 'src/dto/auth.dto';
+import {
+  AuthResponseDto,
+  JwtDto,
+  LoginUserDto,
+  SigninUserDto,
+  WhoAmIDto,
+} from 'src/dto/auth.dto';
 
 @Injectable()
 export class AuthService {
@@ -33,14 +44,10 @@ export class AuthService {
     });
     await this.dataSource.manager.save(createdUser);
 
-    const accessToken = await this.jwtService.signAsync({
-      id: createdUser.id,
-      username: createdUser.username,
-    });
+    const accessToken = this.generateJwt(createdUser);
 
     return {
-      username: createdUser.username,
-      score: createdUser.score,
+      userId: createdUser.id,
       access_token: accessToken,
     };
   }
@@ -60,17 +67,33 @@ export class AuthService {
     const checkHash = await bcrypt.compare(dto.password, user.hash);
 
     if (checkHash) {
-      const accessToken = await this.jwtService.signAsync({
-        id: user.id,
-        username: user.username,
-      });
+      const accessToken = this.generateJwt(user);
       return {
-        username: user.username,
-        score: user.score,
+        userId: user.id,
         access_token: accessToken,
       };
     } else {
       throw new HttpException(`The password is wrong`, HttpStatus.BAD_REQUEST);
     }
+  }
+
+  async whoAmI(query: JwtDto): Promise<WhoAmIDto> {
+    const data = query.jwt.split('.')[1];
+    const parsedData: { id: string; exp: number } = JSON.parse(atob(data));
+    const exp = parsedData.exp * 1000;
+
+    if (Date.now() < exp) {
+      return { id: parsedData.id };
+    } else {
+      throw new UnauthorizedException();
+    }
+  }
+
+  private generateJwt(user: User): string {
+    const jwtData: Partial<User> = {
+      id: user.id,
+    };
+
+    return this.jwtService.sign(jwtData);
   }
 }

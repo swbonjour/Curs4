@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { UserIdDto } from 'src/dto/user.dto';
 import { User } from 'src/entities/User.entity';
 import { DataSource } from 'typeorm';
 
@@ -6,7 +7,15 @@ import { DataSource } from 'typeorm';
 export class UserService {
   constructor(private readonly dataSource: DataSource) {}
 
-  public async getAllUsers() {
-    return await this.dataSource.manager.find(User);
+  async getUserById(dto: UserIdDto): Promise<User> {
+    const user = await this.dataSource.manager.findOne(User, {
+      where: { id: dto.id },
+    });
+
+    if (!user) {
+      throw new BadRequestException('The user is not exist');
+    }
+
+    return user;
   }
 }
