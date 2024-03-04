@@ -1,6 +1,6 @@
 export interface UserDto {
-    id: string;
+    _id: string;
     username: string;
     score: number;
-    is_admin: boolean;
+    is_teacher: boolean;
 }

@@ -95,16 +95,14 @@ const setUserData = async (res: AuthResponseDto): Promise<boolean> => {
 
   let status = false;
 
-  await ApiClient.userControllerGetUserById({
-    id: res.userId,
-  })
+  await ApiClient.userControllerGetUserById(res.userId)
     .then((u) => {
       const user = u as UserDto;
       userStore.setUser({
-        id: user.id,
+        _id: user._id,
         username: user.username,
         score: user.score,
-        is_admin: user.is_admin,
+        is_teacher: user.is_teacher,
       });
       status = true;
     })

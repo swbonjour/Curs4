@@ -3,7 +3,7 @@ import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 @Entity()
 export class User {
   @PrimaryGeneratedColumn('uuid')
-  id: string;
+  _id: string;
 
   @Column({ type: 'text' })
   username: string;
@@ -12,7 +12,7 @@ export class User {
   hash: string;
 
   @Column({ default: false, type: 'boolean' })
-  is_admin: boolean;
+  is_teacher: boolean;
 
   @Column({ default: 0, type: 'integer' })
   score: number;

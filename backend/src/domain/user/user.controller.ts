@@ -1,4 +1,4 @@
-import { Controller, Get, HttpException, Query } from '@nestjs/common';
+import { Controller, Get, HttpException, Param } from '@nestjs/common';
 import { UserService } from './user.service';
 import { UserIdDto } from 'src/dto/user.dto';
 import { User } from 'src/entities/User.entity';
@@ -8,9 +8,9 @@ import { ApiResponse } from '@nestjs/swagger';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @Get(':id')
+  @Get(':_id')
   @ApiResponse({ type: User })
-  async getUserById(@Query() query: UserIdDto): Promise<User | HttpException> {
-    return this.userService.getUserById(query);
+  async getUserById(@Param() param: UserIdDto): Promise<User | HttpException> {
+    return this.userService.getUserById(param);
   }
 }

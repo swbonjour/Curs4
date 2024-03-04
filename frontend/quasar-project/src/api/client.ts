@@ -21,6 +21,18 @@ export interface AuthResponseDto {
 
 export type User = object;
 
+export type Group = object;
+
+export interface CreateGroupDto {
+  name: string;
+  owner: string;
+}
+
+export interface AddUserToGroup {
+  user_id: string;
+  group_id: string;
+}
+
 export interface AuthControllerLoginParams {
   username: string;
   password: string;
@@ -30,8 +42,13 @@ export interface AuthControllerWhoAmIParams {
   jwt: string;
 }
 
-export interface UserControllerGetUserByIdParams {
-  id: string;
+export interface GroupControllerGetGroupsParams {
+  user_id: string;
+  owner: string;
+}
+
+export interface GroupControllerDeleteGroupParams {
+  _id: string;
 }
 
 import type { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from 'axios';
@@ -226,14 +243,74 @@ export class LangApi<SecurityDataType extends unknown> extends HttpClient<Securi
      * No description
      *
      * @name UserControllerGetUserById
-     * @request GET:/api/v1/user/{id}
+     * @request GET:/api/v1/user/{_id}
      */
-    userControllerGetUserById: ({ id, ...query }: UserControllerGetUserByIdParams, params: RequestParams = {}) =>
+    userControllerGetUserById: (id: string, params: RequestParams = {}) =>
       this.request<User, any>({
         path: `/api/v1/user/${id}`,
         method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name GroupControllerGetGroups
+     * @request GET:/api/v1/group
+     */
+    groupControllerGetGroups: (query: GroupControllerGetGroupsParams, params: RequestParams = {}) =>
+      this.request<Group[], any>({
+        path: `/api/v1/group`,
+        method: 'GET',
         query: query,
         format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name GroupControllerCreateGroup
+     * @request POST:/api/v1/group/create
+     */
+    groupControllerCreateGroup: (data: CreateGroupDto, params: RequestParams = {}) =>
+      this.request<Group, any>({
+        path: `/api/v1/group/create`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name GroupControllerAddUserToGroup
+     * @request POST:/api/v1/group/add-user
+     */
+    groupControllerAddUserToGroup: (data: AddUserToGroup, params: RequestParams = {}) =>
+      this.request<Group, any>({
+        path: `/api/v1/group/add-user`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name GroupControllerDeleteGroup
+     * @request DELETE:/api/v1/group/delete
+     */
+    groupControllerDeleteGroup: (query: GroupControllerDeleteGroupParams, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/group/delete`,
+        method: 'DELETE',
+        query: query,
         ...params,
       }),
   };

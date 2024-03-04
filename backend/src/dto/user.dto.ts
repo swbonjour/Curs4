@@ -5,5 +5,5 @@ import { UUID } from 'crypto';
 export class UserIdDto {
   @ApiProperty({ type: String })
   @IsUUID()
-  id: UUID;
+  _id: UUID;
 }

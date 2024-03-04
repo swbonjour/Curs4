@@ -9,7 +9,7 @@ export class UserService {
 
   async getUserById(dto: UserIdDto): Promise<User> {
     const user = await this.dataSource.manager.findOne(User, {
-      where: { id: dto.id },
+      where: { _id: dto._id },
     });
 
     if (!user) {

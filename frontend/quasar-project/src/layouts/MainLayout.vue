@@ -2,6 +2,10 @@
   <q-layout view="lHh Lpr lFf">
     <q-page-container>
       <MainHeader></MainHeader>
+      <div class="row justify-center q-mt-xl" style="width: auto; gap: 2rem; margin-left: 10rem;">
+        <GroupsLayout></GroupsLayout>
+        <MenuLayout></MenuLayout>
+      </div>
     </q-page-container>
   </q-layout>
 </template>
@@ -13,6 +17,8 @@ import { ApiClient } from 'src/api';
 import Router from 'src/router';
 import { useUserStore } from 'src/stores/user';
 import { UserDto } from 'src/types/user';
+import GroupsLayout from './GroupsLayout.vue';
+import MenuLayout from './MenuLayout.vue';
 
 const userStore = useUserStore();
 
@@ -30,19 +36,17 @@ onBeforeMount(async () => {
         Router.push('auth');
       });
   } else {
-    Router.push('auth')
+    Router.push('auth');
   }
 
   if (userId) {
-    await ApiClient.userControllerGetUserById({
-      id: userId,
-    }).then((u) => {
+    await ApiClient.userControllerGetUserById(userId).then((u) => {
       const user = u as UserDto;
       userStore.setUser({
-        id: user.id,
+        _id: user._id,
         username: user.username,
         score: user.score,
-        is_admin: user.is_admin,
+        is_teacher: user.is_teacher,
       });
     });
   }

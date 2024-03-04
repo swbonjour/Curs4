@@ -47,7 +47,7 @@ export class AuthService {
     const accessToken = this.generateJwt(createdUser);
 
     return {
-      userId: createdUser.id,
+      userId: createdUser._id,
       access_token: accessToken,
     };
   }
@@ -69,7 +69,7 @@ export class AuthService {
     if (checkHash) {
       const accessToken = this.generateJwt(user);
       return {
-        userId: user.id,
+        userId: user._id,
         access_token: accessToken,
       };
     } else {
@@ -79,11 +79,11 @@ export class AuthService {
 
   async whoAmI(query: JwtDto): Promise<WhoAmIDto> {
     const data = query.jwt.split('.')[1];
-    const parsedData: { id: string; exp: number } = JSON.parse(atob(data));
+    const parsedData: { _id: string; exp: number } = JSON.parse(atob(data));
     const exp = parsedData.exp * 1000;
 
     if (Date.now() < exp) {
-      return { id: parsedData.id };
+      return { id: parsedData._id };
     } else {
       throw new UnauthorizedException();
     }
@@ -91,7 +91,7 @@ export class AuthService {
 
   private generateJwt(user: User): string {
     const jwtData: Partial<User> = {
-      id: user.id,
+      _id: user._id,
     };
 
     return this.jwtService.sign(jwtData);

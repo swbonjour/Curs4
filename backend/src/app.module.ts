@@ -3,6 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from './entities/User.entity';
 import { AuthModule } from './domain/auth/auth.module';
 import { UserModule } from './domain/user/user.module';
+import { Group } from './entities/group.entity';
+import { GroupModule } from './domain/group/group.module';
 
 @Module({
   imports: [
@@ -13,11 +15,12 @@ import { UserModule } from './domain/user/user.module';
       username: 'postgres',
       password: 'postgres',
       database: 'postgres',
-      entities: [User],
+      entities: [User, Group],
       synchronize: true,
     }),
     AuthModule,
     UserModule,
+    GroupModule,
   ],
   controllers: [],
   providers: [],
