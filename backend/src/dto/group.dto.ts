@@ -37,3 +37,9 @@ export class addUserToGroup {
   @IsUUID()
   group_id: string;
 }
+
+export class GetAllowedUsers {
+  @ApiProperty({ type: UUID })
+  @IsUUID()
+  group_id: string;
+}

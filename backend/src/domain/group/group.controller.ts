@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import {
+  GetAllowedUsers,
   addUserToGroup,
   createGroupDto,
   deleteGroupDto,
@@ -8,6 +9,7 @@ import {
 import { GroupService } from './group.service';
 import { Group } from 'src/entities/group.entity';
 import { ApiResponse } from '@nestjs/swagger';
+import { User } from 'src/entities/User.entity';
 
 @Controller('group')
 export class GroupController {
@@ -27,12 +29,19 @@ export class GroupController {
 
   @Post('add-user')
   @ApiResponse({ type: Group })
-  async addUserToGroup(@Body() body: addUserToGroup): Promise<Group> {
+  async addUserToGroup(@Body() body: addUserToGroup): Promise<User> {
     return await this.groupService.addUserToGroup(body);
   }
 
   @Delete('delete')
   async deleteGroup(@Query() query: deleteGroupDto) {
     return await this.groupService.deleteGroup(query);
+  }
+
+  @Get('allowed')
+  async getAllowedUsers(
+    @Query() query: GetAllowedUsers,
+  ): Promise<{ allowed_users: string[] }> {
+    return await this.groupService.getAllowedUsers(query);
   }
 }

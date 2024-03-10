@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
+  GetAllowedUsers,
   addUserToGroup,
   createGroupDto,
   deleteGroupDto,
@@ -86,7 +87,7 @@ export class GroupService {
     }
   }
 
-  async addUserToGroup(dto: addUserToGroup): Promise<Group> {
+  async addUserToGroup(dto: addUserToGroup): Promise<User> {
     const existingUser = await this.dataSource.manager.findOne(User, {
       where: { _id: dto.user_id },
     });
@@ -119,10 +120,20 @@ export class GroupService {
       );
     }
 
-    const updatedGroup = await this.dataSource.manager.findOne(Group, {
+    return existingUser;
+  }
+
+  async getAllowedUsers(
+    dto: GetAllowedUsers,
+  ): Promise<{ allowed_users: string[] }> {
+    const group = await this.dataSource.manager.findOne(Group, {
       where: { _id: dto.group_id },
     });
 
-    return updatedGroup;
+    if (!group) {
+      throw new HttpException('There is no such group', HttpStatus.BAD_REQUEST);
+    }
+
+    return { allowed_users: group.allowed_users };
   }
 }
