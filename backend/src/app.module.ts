@@ -7,6 +7,8 @@ import { Group } from './entities/group.entity';
 import { GroupModule } from './domain/group/group.module';
 import { QuizModule } from './domain/quiz/quiz/quiz.module';
 import { Quiz } from './entities/quiz.entity';
+import { DictionaryGroup } from './entities/dictionary.group.entity';
+import { Dictionary } from './entities/dictionary.entity';
 
 @Module({
   imports: [
@@ -17,7 +19,7 @@ import { Quiz } from './entities/quiz.entity';
       username: 'postgres',
       password: 'postgres',
       database: 'postgres',
-      entities: [User, Group, Quiz],
+      entities: [User, Group, Quiz, DictionaryGroup, Dictionary],
       synchronize: true,
     }),
     AuthModule,

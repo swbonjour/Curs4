@@ -12,7 +12,7 @@ export class Group {
   @Column({ type: 'uuid', array: true, default: [] })
   allowed_users: string[];
 
-  @OneToOne(() => User, (u) => u._id, { cascade: true })
+  @OneToOne(() => User, (u) => u._id, { onDelete: 'CASCADE' })
   @Column({ type: 'uuid' })
   owner: string;
 }
