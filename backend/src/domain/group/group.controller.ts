@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Post, Query } from '@nestjs/common';
 import {
+  DeleteUserFromGroupDto,
   GetAllowedUsers,
   addUserToGroup,
   createGroupDto,
@@ -43,5 +44,10 @@ export class GroupController {
     @Query() query: GetAllowedUsers,
   ): Promise<{ allowed_users: string[] }> {
     return await this.groupService.getAllowedUsers(query);
+  }
+
+  @Delete('delete-user')
+  async deleteUserFromGroup(@Query() query: DeleteUserFromGroupDto) {
+    return await this.groupService.deleteUserFromGroup(query);
   }
 }

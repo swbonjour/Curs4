@@ -43,3 +43,13 @@ export class GetAllowedUsers {
   @IsUUID()
   group_id: string;
 }
+
+export class DeleteUserFromGroupDto {
+  @ApiProperty({ type: UUID })
+  @IsUUID()
+  group_id: string;
+
+  @ApiProperty({ type: UUID })
+  @IsUUID()
+  user_id: string;
+}

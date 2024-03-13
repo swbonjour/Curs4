@@ -4,24 +4,28 @@
       <div class="groups row offset-2">
         <div
           v-for="item in groups"
-          class="col-3 groups-item column justify-around items-center q-pl-sm q-pr-sm"
+          class="groups-item column justify-around items-center q-pl-sm q-pr-sm"
           style="height: 10rem; position: relative"
           :key="item._id"
+          @click="enterGroup(item._id, item.name)"
         >
           <div
-            style="position: absolute; top: 0; right: 0.2rem"
-            @click="deleteGroup(item._id)"
+            style="position: absolute; top: 0.4rem; right: 0.4rem"
+            @click="((e: MouseEvent) => { deleteGroup(item._id); e.stopPropagation() })"
             v-if="userStore.is_teacher"
           >
-            <q-icon name="close" size="16px" color="red"></q-icon>
+            <q-icon name="close" size="22px" class="close-icon"></q-icon>
           </div>
-          <h5>{{ item.name }}</h5>
-          <h5>{{ groupsMapOnOwnerName.get(item._id) }}</h5>
+          <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1rem;">
+            <h5>{{ item.name }}</h5>
+            <h5>{{ groupsMapOnOwnerName.get(item._id) }}</h5>
+          </div>
         </div>
         <div
-          class="col-3 groups-item column justify-around items-center q-pl-sm q-pr-sm"
+          class="groups-item column justify-around items-center q-pl-sm q-pr-sm"
           style="height: 10rem; position: relative"
           @click="addGroup = true"
+          v-if="userStore.is_teacher"
         >
           <q-icon name="add" size="32px"></q-icon>
         </div>
@@ -31,18 +35,20 @@
 
   <q-dialog v-model="addGroup" persistent>
     <q-card style="width: 30rem; padding: 2rem">
-      <q-card-section>
-        <q-icon
-          name="close"
-          size="32px"
-          style="margin-left: 22rem; cursor: pointer"
+      <q-card-section class="row items-center">
+        <h4>Create new group</h4>
+        <q-space></q-space>
+        <q-btn
+          icon="close"
+          size="22px"
+          flat
+          style="cursor: pointer"
           v-close-popup
           @click="clearInput"
-        ></q-icon>
+        ></q-btn>
       </q-card-section>
-      <h4>Create new group</h4>
       <q-card-section>
-        <q-input v-model="groupName" label="Group name"></q-input>
+        <q-input v-model="groupName" label="Group name" :maxlength="15"></q-input>
       </q-card-section>
       <q-card-section>
         <q-btn
@@ -59,6 +65,8 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
 import { ApiClient } from 'src/api';
+import Router from 'src/router';
+import { useGroupStore } from 'src/stores/group';
 import { useUserStore } from 'src/stores/user';
 import { GroupDto } from 'src/types/group';
 import { UserDto } from 'src/types/user';
@@ -71,6 +79,8 @@ const groupName = ref('');
 
 const userStore = useUserStore();
 const userRefs = storeToRefs(userStore);
+
+const groupStore = useGroupStore();
 
 const deleteGroup = async (id: string) => {
   await ApiClient.groupControllerDeleteGroup({ _id: id });
@@ -94,6 +104,11 @@ const createGroup = async () => {
       });
   });
 };
+
+const enterGroup = (id: string, name: string) => {
+  groupStore.setGroup(id, name);
+  Router.push(`main/group/${id}`);
+}
 
 watch(userRefs._id, async () => {
   await ApiClient.groupControllerGetGroups({
@@ -138,6 +153,7 @@ onMounted(async () => {
   word-break: break-all;
   cursor: pointer;
   transition: background-color 0.2s;
+  width: 30.6%;
 }
 
 .groups-item:hover {
@@ -146,5 +162,14 @@ onMounted(async () => {
 
 .groups-wrapper {
   width: 50rem;
+}
+
+.close-icon {
+  transition: all 0.2s;
+  color: #9e9e9e;
+}
+
+.close-icon:hover {
+  color: red
 }
 </style>

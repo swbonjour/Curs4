@@ -20,6 +20,10 @@ const routes: RouteRecordRaw[] = [
     path: '',
     redirect: '/main',
   },
+  {
+    path: '/main/group/:id',
+    component: () => import('layouts/MainLayout.vue')
+  }
 ];
 
 export default routes;

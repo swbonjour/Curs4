@@ -33,6 +33,22 @@ export interface AddUserToGroup {
   group_id: string;
 }
 
+export type Quiz = object;
+
+export interface AddQuizDto {
+  group: string;
+  question: string;
+  answers: string[];
+  correct_answer: string;
+  score: number;
+  user_id: string;
+}
+
+export interface QuizAnswerDto {
+  id: string;
+  user_id: string;
+}
+
 export interface AuthControllerLoginParams {
   username: string;
   password: string;
@@ -42,6 +58,14 @@ export interface AuthControllerWhoAmIParams {
   jwt: string;
 }
 
+export interface UserControllerGetUsersByIdParams {
+  _id: string;
+}
+
+export interface UserControllerGetUsersNotInSpaceParams {
+  group_id: string;
+}
+
 export interface GroupControllerGetGroupsParams {
   user_id: string;
   owner: string;
@@ -49,6 +73,23 @@ export interface GroupControllerGetGroupsParams {
 
 export interface GroupControllerDeleteGroupParams {
   _id: string;
+}
+
+export interface GroupControllerGetAllowedUsersParams {
+  group_id: string;
+}
+
+export interface GroupControllerDeleteUserFromGroupParams {
+  group_id: string;
+  user_id: string;
+}
+
+export interface QuizControllerGetQuestionsForGroupParams {
+  group: string;
+}
+
+export interface QuizControllerDeleteQuestionFromGroupParams {
+  id: string;
 }
 
 import type { AxiosInstance, AxiosRequestConfig, HeadersDefaults, ResponseType } from 'axios';
@@ -243,12 +284,42 @@ export class LangApi<SecurityDataType extends unknown> extends HttpClient<Securi
      * No description
      *
      * @name UserControllerGetUserById
-     * @request GET:/api/v1/user/{_id}
+     * @request GET:/api/v1/user/get-by-id/{_id}
      */
     userControllerGetUserById: (id: string, params: RequestParams = {}) =>
       this.request<User, any>({
-        path: `/api/v1/user/${id}`,
+        path: `/api/v1/user/get-by-id/${id}`,
         method: 'GET',
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name UserControllerGetUsersById
+     * @request GET:/api/v1/user/users
+     */
+    userControllerGetUsersById: (query: UserControllerGetUsersByIdParams, params: RequestParams = {}) =>
+      this.request<User, any>({
+        path: `/api/v1/user/users`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name UserControllerGetUsersNotInSpace
+     * @request GET:/api/v1/user/group
+     */
+    userControllerGetUsersNotInSpace: (query: UserControllerGetUsersNotInSpaceParams, params: RequestParams = {}) =>
+      this.request<User, any>({
+        path: `/api/v1/user/group`,
+        method: 'GET',
+        query: query,
         format: 'json',
         ...params,
       }),
@@ -311,6 +382,97 @@ export class LangApi<SecurityDataType extends unknown> extends HttpClient<Securi
         path: `/api/v1/group/delete`,
         method: 'DELETE',
         query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name GroupControllerGetAllowedUsers
+     * @request GET:/api/v1/group/allowed
+     */
+    groupControllerGetAllowedUsers: (query: GroupControllerGetAllowedUsersParams, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/group/allowed`,
+        method: 'GET',
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name GroupControllerDeleteUserFromGroup
+     * @request DELETE:/api/v1/group/delete-user
+     */
+    groupControllerDeleteUserFromGroup: (query: GroupControllerDeleteUserFromGroupParams, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/group/delete-user`,
+        method: 'DELETE',
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name QuizControllerGetQuestionsForGroup
+     * @request GET:/api/v1/quiz
+     */
+    quizControllerGetQuestionsForGroup: (query: QuizControllerGetQuestionsForGroupParams, params: RequestParams = {}) =>
+      this.request<Quiz[], any>({
+        path: `/api/v1/quiz`,
+        method: 'GET',
+        query: query,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name QuizControllerAddQuestionToGroup
+     * @request POST:/api/v1/quiz/add
+     */
+    quizControllerAddQuestionToGroup: (data: AddQuizDto, params: RequestParams = {}) =>
+      this.request<Quiz, any>({
+        path: `/api/v1/quiz/add`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        format: 'json',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name QuizControllerDeleteQuestionFromGroup
+     * @request DELETE:/api/v1/quiz/delete
+     */
+    quizControllerDeleteQuestionFromGroup: (
+      query: QuizControllerDeleteQuestionFromGroupParams,
+      params: RequestParams = {},
+    ) =>
+      this.request<void, any>({
+        path: `/api/v1/quiz/delete`,
+        method: 'DELETE',
+        query: query,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name QuizControllerSendCorrectAnswer
+     * @request PUT:/api/v1/quiz/answer
+     */
+    quizControllerSendCorrectAnswer: (data: QuizAnswerDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/quiz/answer`,
+        method: 'PUT',
+        body: data,
+        type: ContentType.Json,
         ...params,
       }),
   };

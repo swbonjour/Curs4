@@ -22,5 +22,9 @@ export const useUserStore = defineStore('user', {
       this.score = action.score;
       this.is_teacher = action.is_teacher;
     },
+
+    addScore(action: { score: number }) {
+      this.score += action.score;
+    },
   },
 });

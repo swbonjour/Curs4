@@ -2,8 +2,15 @@
   <q-layout view="lHh Lpr lFf">
     <q-page-container>
       <MainHeader></MainHeader>
-      <div class="row justify-center q-mt-xl" style="width: auto; gap: 2rem; margin-left: 10rem;">
-        <GroupsLayout></GroupsLayout>
+      <div style="display: flex; width: 100%; justify-content: center;" class="q-mt-xl">
+        <div style="width: 20%; display: flex; justify-content: flex-end;">
+          <h4 v-if="!groupStore.group_name">Select group</h4>
+          <h4 v-else style="word-break: break-all;">Group: {{ groupStore.group_name }}</h4>
+        </div>
+        <div style="width: 60%; display: flex; justify-content: center;">
+          <GroupsLayout v-if="Router.currentRoute.value.fullPath === '/main'"></GroupsLayout>
+          <GroupLayout v-if="Router.currentRoute.value.fullPath.includes('group')"></GroupLayout>
+        </div>
         <MenuLayout></MenuLayout>
       </div>
     </q-page-container>
@@ -19,12 +26,15 @@ import { useUserStore } from 'src/stores/user';
 import { UserDto } from 'src/types/user';
 import GroupsLayout from './GroupsLayout.vue';
 import MenuLayout from './MenuLayout.vue';
+import GroupLayout from './GroupLayout.vue';
+import { useGroupStore } from 'src/stores/group';
 
 const userStore = useUserStore();
 
+const groupStore = useGroupStore();
+
 onBeforeMount(async () => {
   const jwt = localStorage.getItem('jwt');
-  console.log(jwt);
   let userId = '';
   if (jwt) {
     await ApiClient.authControllerWhoAmI({ jwt: jwt })

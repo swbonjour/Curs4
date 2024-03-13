@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import {
+  DeleteUserFromGroupDto,
   GetAllowedUsers,
   addUserToGroup,
   createGroupDto,
@@ -135,5 +136,29 @@ export class GroupService {
     }
 
     return { allowed_users: group.allowed_users };
+  }
+
+  async deleteUserFromGroup(dto: DeleteUserFromGroupDto) {
+    const group = await this.dataSource.manager.findOne(Group, {
+      where: { _id: dto.group_id },
+    });
+
+    if (!group) {
+      throw new HttpException('There is no such group', HttpStatus.BAD_REQUEST);
+    }
+
+    const user = await this.dataSource.manager.findOne(User, {
+      where: { _id: dto.user_id },
+    });
+
+    if (!user) {
+      throw new HttpException('Threr is no such user', HttpStatus.BAD_REQUEST);
+    }
+
+    await this.dataSource.manager.query(
+      `UPDATE public.group
+      SET allowed_users = ARRAY_REMOVE(allowed_users, '${dto.user_id}')
+      WHERE _id = '${dto.group_id}'`,
+    );
   }
 }
