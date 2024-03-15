@@ -100,7 +100,12 @@
     >
       <div v-for="item in users" :key="item._id">
         <div class="user-item">
-          <q-icon name="close" size="22px" class="user-delete" @click="deleteUser(item._id)"></q-icon>
+          <q-icon
+            name="close"
+            size="22px"
+            class="user-delete"
+            @click="deleteUser(item._id)"
+          ></q-icon>
           <h4>{{ item.username }}</h4>
           <h5>Score: {{ item.score }}</h5>
         </div>
@@ -171,6 +176,61 @@
         </div>
       </div>
     </div>
+    <div
+      v-if="
+        groupRef.option.value === GroupOption.DICTIONARY && !selectedDictionary
+      "
+      style="display: flex; align-items: center; gap: 1rem"
+    >
+      <div v-for="item in dictionaryGroups" :key="item._id">
+        <div class="dictionary-item" @click="selectedDictionary = item._id">
+          <q-icon
+            name="close"
+            size="22px"
+            class="dictionary-delete"
+            @click="deleteUser(item._id)"
+          ></q-icon>
+          <h4>{{ item.name }}</h4>
+        </div>
+      </div>
+      <div
+        class="dictionary-item-add"
+        @click="
+          async () => {
+            addDictionaryGroup = true;
+          }
+        "
+      >
+        <q-icon name="add" size="32px" color="grey"></q-icon>
+      </div>
+    </div>
+    <div v-if="selectedDictionary">
+      <q-icon name="close" style="margin-left: 100%; cursor: pointer;"></q-icon>
+      <div>
+        <div style="display: flex; justify-content: space-between; margin-top: 2rem;">
+          <p>Eng</p>
+          <p>Ru</p>
+          <p>Description</p>
+        </div>
+        <div v-for="item in dictionary" :key="item._id" style="display: flex; justify-content: space-between">
+          <p>{{ item.eng_word }}</p>
+          <p>{{ item.ru_word }}</p>
+          <p>{{ item.description_word }}</p>
+        </div>
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            margin-top: 2rem;
+          "
+        >
+          <q-input v-model="eng" label="eng"></q-input>
+          <q-input v-model="ru" label="ru"></q-input>
+          <q-input v-model="description" label="description"></q-input>
+          <q-btn label="create" @click="createDictionary"></q-btn>
+        </div>
+      </div>
+    </div>
   </div>
 
   <q-dialog v-model="addQuiz" persistent>
@@ -235,6 +295,35 @@
       </q-card-section>
     </q-card>
   </q-dialog>
+
+  <q-dialog v-model="addDictionaryGroup" persistent>
+    <q-card style="width: 32rem; padding: 2rem">
+      <q-card-section class="row items-center">
+        <h4>Create new dictionary</h4>
+        <q-space></q-space>
+        <q-btn
+          icon="close"
+          size="22px"
+          flat
+          style="cursor: pointer"
+          v-close-popup
+          @click="clearInput"
+        ></q-btn>
+      </q-card-section>
+      <q-card-section>
+        <q-input v-model="dictionaryName" label="Dictionary name"></q-input>
+      </q-card-section>
+      <q-card-section>
+        <q-btn
+          flat
+          label="Create"
+          v-close-popup
+          style="margin-left: 18rem"
+          @click="createDictionaryGroup"
+        ></q-btn>
+      </q-card-section>
+    </q-card>
+  </q-dialog>
 </template>
 <script setup lang="ts">
 import { storeToRefs } from 'pinia';
@@ -242,6 +331,7 @@ import { ApiClient } from 'src/api';
 import { User } from 'src/api/client';
 import { GroupOption, useGroupStore } from 'src/stores/group';
 import { useUserStore } from 'src/stores/user';
+import { DictionaryDto, DictionaryGroupDto } from 'src/types/DictionaryGroup';
 import { QuizDto } from 'src/types/quiz';
 import { UserDto } from 'src/types/user';
 import { onMounted, ref, watch } from 'vue';
@@ -365,7 +455,7 @@ const selectedVoice = ref('Man 1 - English');
 
 const voicePitch = ref(1);
 
-const voiceRatio = ref(1)
+const voiceRatio = ref(1);
 
 const voiceOptions = [
   'Woman 1 - Russian',
@@ -402,7 +492,7 @@ const speechSynthesis = (text: string) => {
 
 const speechStop = () => {
   synth.cancel();
-}
+};
 
 const deleteQuiz = async (quiz_id: string) => {
   await ApiClient.quizControllerDeleteQuestionFromGroup({ id: quiz_id });
@@ -415,8 +505,50 @@ const deleteUser = async (user_id: string) => {
     group_id: groupStore.group_id,
   });
 
-  users.value = users.value.filter((item) => item._id !== user_id)
+  users.value = users.value.filter((item) => item._id !== user_id);
 };
+
+const dictionaryGroups = ref<DictionaryGroupDto[]>([]);
+
+const addDictionaryGroup = ref(false);
+
+const dictionaryName = ref('');
+
+const selectedDictionary = ref('');
+
+const dictionary = ref<DictionaryDto[]>([]);
+
+const eng = ref('');
+const ru = ref('');
+const description = ref('');
+
+const createDictionaryGroup = async () => {
+  await ApiClient.dictionaryControllerCreateDictonaryGroup({
+    group_id: groupStore.group_id,
+    name: dictionaryName.value,
+  }).then((res: any) => {
+    dictionaryGroups.value.push(res);
+  });
+};
+
+const createDictionary = async () => {
+  await ApiClient.dictionaryControllerCreateDictionary({
+    dictionary_group_id: selectedDictionary.value,
+    eng_word: eng.value,
+    ru_word: ru.value,
+    description_word: description.value,
+  }).then((res: any) => {
+    dictionary.value.push(res);
+  });
+};
+
+watch(selectedDictionary, async () => {
+  await ApiClient.dictionaryControllerGetDictionary(
+    selectedDictionary.value
+  ).then((res: any) => {
+    dictionary.value.push(res);
+  });
+});
 
 onMounted(async () => {
   await ApiClient.quizControllerGetQuestionsForGroup({
@@ -434,6 +566,12 @@ onMounted(async () => {
     }).then((res: any) => {
       users.value = res;
     });
+  });
+
+  await ApiClient.dictionaryControllerGetDictionaryGroup(
+    groupStore.group_id
+  ).then((res: any) => {
+    dictionaryGroups.value = res;
   });
 });
 </script>
@@ -513,6 +651,45 @@ onMounted(async () => {
 }
 
 .user-delete:hover {
+  color: red;
+}
+
+.dictionary-item {
+  width: 10rem;
+  height: 8rem;
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  border-radius: 5px;
+  position: relative;
+  cursor: pointer;
+}
+
+.dictionary-item-add {
+  width: 10rem;
+  height: 8rem;
+  border: 1px solid black;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 1rem;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.dictionary-delete {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  cursor: pointer;
+  transition: all 0.1s;
+}
+
+.dictionary-delete:hover {
   color: red;
 }
 </style>

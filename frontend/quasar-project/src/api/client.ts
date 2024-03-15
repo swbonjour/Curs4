@@ -49,6 +49,18 @@ export interface QuizAnswerDto {
   user_id: string;
 }
 
+export interface CreateDictionaryGroupDto {
+  group_id: string;
+  name: string;
+}
+
+export interface CreateDictionary {
+  dictionary_group_id: string;
+  eng_word: string;
+  ru_word: string;
+  description_word: string;
+}
+
 export interface AuthControllerLoginParams {
   username: string;
   password: string;
@@ -473,6 +485,62 @@ export class LangApi<SecurityDataType extends unknown> extends HttpClient<Securi
         method: 'PUT',
         body: data,
         type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name DictionaryControllerCreateDictonaryGroup
+     * @request POST:/api/v1/dictionary/create-group
+     */
+    dictionaryControllerCreateDictonaryGroup: (data: CreateDictionaryGroupDto, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/dictionary/create-group`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name DictionaryControllerGetDictionaryGroup
+     * @request GET:/api/v1/dictionary/group/{group_id}
+     */
+    dictionaryControllerGetDictionaryGroup: (groupId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/dictionary/group/${groupId}`,
+        method: 'GET',
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name DictionaryControllerCreateDictionary
+     * @request POST:/api/v1/dictionary/create-dict
+     */
+    dictionaryControllerCreateDictionary: (data: CreateDictionary, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/dictionary/create-dict`,
+        method: 'POST',
+        body: data,
+        type: ContentType.Json,
+        ...params,
+      }),
+
+    /**
+     * No description
+     *
+     * @name DictionaryControllerGetDictionary
+     * @request GET:/api/v1/dictionary/dict/{dictionary_group_id}
+     */
+    dictionaryControllerGetDictionary: (dictionaryGroupId: string, params: RequestParams = {}) =>
+      this.request<void, any>({
+        path: `/api/v1/dictionary/dict/${dictionaryGroupId}`,
+        method: 'GET',
         ...params,
       }),
   };

@@ -9,6 +9,7 @@ import { QuizModule } from './domain/quiz/quiz/quiz.module';
 import { Quiz } from './entities/quiz.entity';
 import { DictionaryGroup } from './entities/dictionary.group.entity';
 import { Dictionary } from './entities/dictionary.entity';
+import { DictionaryModule } from './domain/dictionary/dictionary.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { Dictionary } from './entities/dictionary.entity';
     UserModule,
     GroupModule,
     QuizModule,
+    DictionaryModule,
   ],
   controllers: [],
   providers: [],

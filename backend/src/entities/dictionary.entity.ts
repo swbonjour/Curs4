@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { DictionaryGroup } from './dictionary.group.entity';
 
 @Entity()
 export class Dictionary {
@@ -6,6 +7,7 @@ export class Dictionary {
   _id: string;
 
   @Column({ type: 'uuid' })
+  @ManyToOne(() => DictionaryGroup, (d) => d._id, { onDelete: 'CASCADE' })
   dictionary_group_id: string;
 
   @Column({ type: 'text' })

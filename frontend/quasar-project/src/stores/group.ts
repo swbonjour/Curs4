@@ -5,6 +5,7 @@ export enum GroupOption {
   QUIZ = 'quiz',
   USERS = 'users',
   LISTENING = 'listening',
+  DICTIONARY = 'dictionary',
 }
 
 export const useGroupStore = defineStore('group', {

@@ -10,9 +10,10 @@
   >
     <div v-if="Router.currentRoute.value.fullPath !== '/main'">
       <h4 @click="home">Home</h4>
-      <h4 @click="selectGroupOption(GroupOption.USERS)" v-if="userStore.is_teacher" style="padding-top: 2rem;">Users</h4>
+      <h4 @click="selectGroupOption(GroupOption.USERS)" v-if="userStore.is_teacher" style="padding-top: 4rem;">Users</h4>
       <h4 @click="selectGroupOption(GroupOption.QUIZ)" style="padding-top: 2rem;">Quiz</h4>
       <h4 @click="selectGroupOption(GroupOption.LISTENING)" style="padding-top: 2rem;">Listening</h4>
+      <h4 @click="selectGroupOption(GroupOption.DICTIONARY)" style="padding-top: 2rem;">Dictionary</h4>
     </div>
     <h4 @click="logout" style="cursor: pointer">Logout</h4>
   </div>
